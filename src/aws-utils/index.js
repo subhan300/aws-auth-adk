@@ -2,14 +2,14 @@ import {
   CognitoIdentityProviderClient,
   InitiateAuthCommand,
   RespondToAuthChallengeCommand,
+  AdminInitiateAuthCommand
 } from "@aws-sdk/client-cognito-identity-provider";
-import { createHmac } from "crypto" 
 import {
   AdminRespondToAuthChallengeCommand,
   ChallengeNameType,
 } from "@aws-sdk/client-cognito-identity-provider";
 import dayjs from "dayjs";
-import { passwordClaimSignature, passwordVerifierConfig } from "./calculateFucntions";
+import { calculateSRP_A, passwordClaimSignature, passwordVerifierConfig } from "./calculateFucntions";
 
 function generateRandomHexPassword(length) {
   const charset = "0123456789abcdefABCDEF";
@@ -23,40 +23,9 @@ function generateRandomHexPassword(length) {
 
 // Function to authenticate user and handle Multi-Factor Authentication (MFA)
 const clientId = "51uf6q4h1llc4n80hsle6lhqpk";
-const userPoolId = "51uf6q4h1llc4n80hsle6lhqpk";
+const userPoolId = "ap-south-1_iUi5jchz5";
 const client = new CognitoIdentityProviderClient({ region: "ap-south-1" });
-export async function signIn(username, password) {
-  // debugger
-  const initiateAuthCommand = new InitiateAuthCommand({
-    // AuthFlow: 'USER_PASSWORD_AUTH',
-    AuthFlow: "USER_SRP_AUTH",
-    ClientId: clientId,
-    AuthParameters: {
-      USERNAME: username,
-      // 'EMAIL':'subhan.akram2400@gmail.com',
-      SRP_A: generateRandomHexPassword(32),
-    //   PASSWORD: "samsungj300",
-    },
-  });
 
-  try {
-    const authResponse = await client.send(initiateAuthCommand);
-    console.log("auth response===", authResponse);
-   
-    return authResponse;
-    // // Step 2: Respond to MFA challenge
-    // const respondToMFAResponse = await respondToMFAChallenge(session, mfaCode, clientId, userPoolId);
-
-    // // Step 3: Confirm MFA
-    // const confirmMFAResponse = await confirmMFA(session, mfaCode, clientId, userPoolId);
-
-    // // Return authentication result
-    // return confirmMFAResponse.AuthenticationResult;
-  } catch (error) {
-    console.error("Error authenticating with MFA:", error);
-    throw error;
-  }
-}
 
 // Function to respond to Multi-Factor Authentication (MFA) challenge
 async function respondToMFAChallenge(session, mfaCode, clientId, userPoolId) {
@@ -83,7 +52,7 @@ async function respondToMFAChallenge(session, mfaCode, clientId, userPoolId) {
 
 // Function to confirm Multi-Factor Authentication (MFA)
 async function confirmMFA(session, mfaCode, clientId, userPoolId) {
-  const client = new CognitoIdentityProviderClient({ region: "us-west-2" });
+  const client = new CognitoIdentityProviderClient({ region: "ap-south-1" });
 
   const respondToAuthChallengeCommand = new RespondToAuthChallengeCommand({
     ChallengeName: "SOFTWARE_TOKEN_MFA",
@@ -119,56 +88,59 @@ export function getCurrentTimestamp() {
     return timestamp.format('ddd MMM D HH:mm:ss [UTC] YYYY');
 }
 
-// const adminRespondToAuthChallenge = (authObj) => {
-//     const {ChallengeName}=authObj
-//     const {USERNAME,SECRET_BLOCK,SRP_B}=authObj.ChallengeParameters
-//   const client = new CognitoIdentityProviderClient({ region: "us-west-2" });
-//   const command = new RespondToAuthChallengeCommand({
-//     ChallengeName,
-//     ChallengeResponses: {
-//       // SOFTWARE_TOKEN_MFA_CODE: totp,
-//       USERNAME,
-//       CHALLENGE_NAME: ChallengeName,
-//       PASSWORD_CLAIM_SIGNATURE:SRP_B,
-//       PASSWORD_CLAIM_SECRET_BLOCK: SECRET_BLOCK,
-//       'TIMESTAMP': getCurrentTimestamp()
-//     },
-//     ClientId: clientId,
-//     UserPoolId: userPoolId,
-//     // Session: session,
-//   });
-//   console.log("comman ",command)
-//   return client.send(command);
-// };
 
+export async function signIn(username, password) {
+  // debugger
+
+  const {SRP_A}=await calculateSRP_A(userPoolId)
+  console.log("calculateSRP_A(userPoolId)",SRP_A)
+  const initiateAuthCommand = new InitiateAuthCommand({
+    // AuthFlow: 'USER_PASSWORD_AUTH',
+    AuthFlow: "USER_SRP_AUTH",
+    ClientId: clientId,
+    UserPoolId: userPoolId,
+    AuthParameters: {
+      USERNAME: username,     
+      SRP_A
+
+    },
+  });
+
+  try {
+    const authResponse = await client.send(initiateAuthCommand);
+    console.log("auth response===", authResponse);
+   
+    return authResponse;
+
+  } catch (error) {
+    console.error("Error authenticating with:", error);
+    throw error;
+  }
+}
 const adminRespondToAuthChallenge = async (authObj) => {
     const { ChallengeName } = authObj;
     const { USERNAME, SECRET_BLOCK, SRP_B ,SALT} = authObj.ChallengeParameters;
     
 
-    // Generate required parameters
-    const deviceKey = "device123";
-    const deviceGroupKey = "group1";
-    const devicePassword = "password123";
+
+    const password = "samsungj300";
     const timestamp = getCurrentTimestamp();
     const srpSalt = SALT; // You may need to obtain this from your challenge parameters
 
     // Calculate PASSWORD_CLAIM_SIGNATURE using passwordClaimSignature function
-    const passwordClaimSignatureValue =await  passwordClaimSignature(SRP_B, srpSalt, timestamp, SECRET_BLOCK,deviceKey,deviceGroupKey,devicePassword);
+    const {signature,dateNow}=await  passwordClaimSignature(USERNAME,password,SRP_B, srpSalt,SECRET_BLOCK);
 
-    // Generate PASSWORD_CLAIM_SECRET_BLOCK and PASSWORD_CLAIM_SIGNATURE
-    // const { devicePassword: PASSWORD_CLAIM_SECRET_BLOCK, passwordVerifier: PASSWORD_CLAIM_SIGNATURE } =await passwordVerifierConfig(deviceKey, deviceGroupKey);
-    // console.log('passwordClaimSignatureValue',passwordClaimSignatureValue,'---',PASSWORD_CLAIM_SECRET_BLOCK)
-    // Send the request to respond to the authentication challenge
-    const client = new CognitoIdentityProviderClient({ region: "us-west-2" });
+    console.log('passwordClaimSignatureValue',signature)
+
+    const client = new CognitoIdentityProviderClient({ region: "ap-south-1" });
     const command = new RespondToAuthChallengeCommand({
         ChallengeName,
         ChallengeResponses: {
             USERNAME,
             CHALLENGE_NAME: ChallengeName,
-            PASSWORD_CLAIM_SIGNATURE: 'TJzL+NqFoqJYYMQy0iCY8T/SvHxGlT9nGKccw11yEYQ=' ,
-            // PASSWORD_CLAIM_SECRET_BLOCK:"TJzL+NqFoqJYYMQy0iCY8T/SvHxGlT9nGKccw11yEYQ=",
-            TIMESTAMP: timestamp
+            PASSWORD_CLAIM_SIGNATURE: signature ,
+            PASSWORD_CLAIM_SECRET_BLOCK:SECRET_BLOCK,
+            TIMESTAMP: dateNow
         },
         ClientId: clientId,
         UserPoolId: userPoolId,
@@ -192,3 +164,24 @@ export { adminRespondToAuthChallenge };
 //     .catch((error) => {
 //         console.error('Error authenticating with MFA:', error);
 //     });
+// const adminRespondToAuthChallenge = (authObj) => {
+//     const {ChallengeName}=authObj
+//     const {USERNAME,SECRET_BLOCK,SRP_B}=authObj.ChallengeParameters
+//   const client = new CognitoIdentityProviderClient({ region: "us-west-2" });
+//   const command = new RespondToAuthChallengeCommand({
+//     ChallengeName,
+//     ChallengeResponses: {
+//       // SOFTWARE_TOKEN_MFA_CODE: totp,
+//       USERNAME,
+//       CHALLENGE_NAME: ChallengeName,
+//       PASSWORD_CLAIM_SIGNATURE:SRP_B,
+//       PASSWORD_CLAIM_SECRET_BLOCK: SECRET_BLOCK,
+//       'TIMESTAMP': getCurrentTimestamp()
+//     },
+//     ClientId: clientId,
+//     UserPoolId: userPoolId,
+//     // Session: session,
+//   });
+//   console.log("comman ",command)
+//   return client.send(command);
+// };

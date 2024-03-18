@@ -5,8 +5,8 @@ import './App.css'
 import { adminRespondToAuthChallenge, getCurrentTimestamp, signIn } from './aws-utils'
 
 function App() {
-  const [username, setUserName] = useState("subhanakram")
-  const [password,setPassword]=useState("a1b2c3d4e5f6")
+  const [username, setUserName] = useState("subhan.akram2400@gmail.com")
+  const [password,setPassword]=useState("samsungj300")
   const [mfa,setMfa]=useState("")
   const [confirmMfa,setConfirmMfa]=useState("")
   const login=async()=>{
