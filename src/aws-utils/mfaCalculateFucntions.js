@@ -29,6 +29,7 @@ export const passwordClaimSignature =async (
   const userPoolName = userPoolId.split("_")[1];
   const authenticationHelper = new AuthenticationHelperWrapper(userPoolName);
   const hkdfResult = { hkdf: "" };
+  debugger
   authenticationHelper.getPasswordAuthenticationKey(
     username,
     password,

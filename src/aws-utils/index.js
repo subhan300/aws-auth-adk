@@ -90,6 +90,7 @@ const adminRespondToAuthChallenge = async (authObj,password) => {
     const { ChallengeName } = authObj;
     const { USERNAME, SECRET_BLOCK, SRP_B ,SALT} = authObj.ChallengeParameters;
     const srpSalt = SALT; 
+    debugger
 
     const {signature,dateNow}=await  passwordClaimSignature(USERNAME,password,SRP_B, srpSalt,SECRET_BLOCK);
 
