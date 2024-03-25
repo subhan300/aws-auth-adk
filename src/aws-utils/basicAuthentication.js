@@ -6,7 +6,9 @@ import {
     } from "@aws-sdk/client-cognito-identity-provider";
 
 // Initialize CognitoIdentityProviderClient
-const cognitoClient = new CognitoIdentityProviderClient({ region: "ap-south-1" });
+const clientId = process.env.CLIENT_ID;
+const userPoolId = process.env.USER_POOL_ID;
+const cognitoClient = new CognitoIdentityProviderClient({ region: process.env.REGION});
 
 // Initialize function to configure SDK
 async function initializeCognito() {
@@ -18,7 +20,7 @@ async function initiateAuth(username, password) {
     try {
         const response = await cognitoClient.send(new InitiateAuthCommand({
             AuthFlow: "USER_PASSWORD_AUTH",
-            ClientId: "51uf6q4h1llc4n80hsle6lhqpk",
+            ClientId: clientId,
             AuthParameters: {
                 USERNAME: username,
                 PASSWORD: password
@@ -84,16 +86,16 @@ async function initiateAndRespondToAuth(username, password, newPassword) {
 
 
 async function createUser(username, password, email) {
+    debugger
     try {
         // Call the SignUp API to create a new user
         const command = new AdminCreateUserCommand({
-            //ClientId: "51uf6q4h1llc4n80hsle6lhqpk", // Replace with your Cognito User Pool client ID
-            UserPoolId: process.env.USER_POOL_ID,
+            ClientId:clientId, // Replace with your Cognito User Pool client ID
+            UserPoolId: userPoolId,
             Username: username,
             TemporaryPassword: password,
             UserAttributes: [
                 { Name: "email", Value: email },
-                // Add any additional user attributes here if needed
             ],
             DesiredDeliveryMediums: ["EMAIL"], // Specify the delivery medium for sending invitation messages to new users
             MessageAction: "SUPPRESS", // Specify whether to send an invitation message to the new user
