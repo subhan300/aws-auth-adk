@@ -3,7 +3,6 @@ import {
   InitiateAuthCommand,
   RespondToAuthChallengeCommand,
 } from "@aws-sdk/client-cognito-identity-provider";
-import dayjs from "dayjs";
 import { calculateSRP_A, passwordClaimSignature } from "./mfaCalculateFucntions";
 
 const clientId = process.env.CLIENT_ID;
@@ -11,7 +10,6 @@ const userPoolId = process.env.USER_POOL_ID;
 const client = new CognitoIdentityProviderClient({ region: process.env.REGION});
 
 
-// Function to respond to Multi-Factor Authentication (MFA) challenge
 async function respondToMFAChallenge(session, mfaCode, clientId, userPoolId) {
   const client = new CognitoIdentityProviderClient({ region: "us-west-2" });
 
@@ -90,8 +88,6 @@ const adminRespondToAuthChallenge = async (authObj,password) => {
     const { ChallengeName } = authObj;
     const { USERNAME, SECRET_BLOCK, SRP_B ,SALT} = authObj.ChallengeParameters;
     const srpSalt = SALT; 
-    debugger
-
     const {signature,dateNow}=await  passwordClaimSignature(USERNAME,password,SRP_B, srpSalt,SECRET_BLOCK);
 
     console.log('passwordClaimSignatureValue',signature)

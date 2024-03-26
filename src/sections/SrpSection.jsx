@@ -6,7 +6,7 @@ import {
 
 function SrpSection() {
   const [username, setUserName] = useState("subhan.akram2400@gmail.com");
-  const [password, setPassword] = useState("samsungj300");
+  const [password, setPassword] = useState("4qfm_eQTM2vc");
   const [mfa, setMfa] = useState("");
   const [confirmMfa, setConfirmMfa] = useState("");
   const login = async () => {

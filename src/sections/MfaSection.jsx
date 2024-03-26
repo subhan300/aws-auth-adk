@@ -1,24 +1,23 @@
 import React,{ useState } from "react";
 import {
   adminRespondToAuthChallenge,
-  getCurrentTimestamp,
   signIn,
 } from "../aws-utils";
 
-function SimpleAuthSection() {
-  const [username, setUserName] = useState("subhan.akram2400@gmail.com");
-  const [password, setPassword] = useState("samsungj300");
+function MfaSection() {
+    const [username, setUserName] = useState("subhan.akram2400@gmail.com");
+    const [password, setPassword] = useState("4qfm_eQTM2vc");
   const [mfa, setMfa] = useState("");
   const [confirmMfa, setConfirmMfa] = useState("");
   const login = async () => {
     const authObj = await signIn(username, password);
-    console.log("auth obj===", authObj);
-    adminRespondToAuthChallenge(authObj);
+    console.log("Auth Object===", authObj);
+    adminRespondToAuthChallenge(authObj,password);
   };
-  getCurrentTimestamp();
+
   return (
     <div>
-      <h2 onClick={getCurrentTimestamp}>* Aws SRP Auth</h2>
+      <h2 >* Aws SRP Auth</h2>
       <p>Login</p>
       <input
         value={username}
@@ -60,4 +59,4 @@ function SimpleAuthSection() {
   );
 }
 
-export default SimpleAuthSection;
+export default MfaSection;

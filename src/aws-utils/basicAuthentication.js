@@ -10,12 +10,7 @@ const clientId = process.env.CLIENT_ID;
 const userPoolId = process.env.USER_POOL_ID;
 const cognitoClient = new CognitoIdentityProviderClient({ region: process.env.REGION});
 
-// Initialize function to configure SDK
-async function initializeCognito() {
-    // You can add any additional configuration here
-}
 
-// Function to initiate authentication
 async function initiateAuth(username, password) {
     try {
         const response = await cognitoClient.send(new InitiateAuthCommand({
@@ -32,18 +27,13 @@ async function initiateAuth(username, password) {
         throw error;
     }
 }
-// Function to respond to authentication challenge
-async function respondToAuthChallenge(session, challengeResponses) {
+async function respondToAuthChallenge(Session, ChallengeResponses) {
     try {
         const response = await cognitoClient.send(new RespondToAuthChallengeCommand({
             ChallengeName: "NEW_PASSWORD_REQUIRED", // Change according to the challenge type
-            ClientId: "51uf6q4h1llc4n80hsle6lhqpk",
-            ChallengeResponses: {
-                USERNAME:"hasnainaskari32@gmail.com",
-                NEW_PASSWORD: challengeResponses.newPassword,
-                 
-            },  
-            Session:session   
+            ClientId: clientId,
+            ChallengeResponses,  
+            Session   
         }));
 
         return response;
@@ -54,35 +44,6 @@ async function respondToAuthChallenge(session, challengeResponses) {
 }
 
 
-async function initiateAndRespondToAuth(username, password, newPassword) {
-    try {
-        // Initiate authentication
-        const authResult = await initiateAuth(username, password);
-
-        // Handle authentication challenge if necessary
-        if (authResult.ChallengeName === 'NEW_PASSWORD_REQUIRED') {
-            const session = {
-                username: username,
-                secretHash:"/TJzL+NqFoqJYYMQy0iCY8T/SvHxGlT9nGKccw11yEYQ=",
-                // Add other session parameters if needed
-            };
-            const challengeResponses = {
-                newPassword: newPassword,
-                // Add other challenge responses if needed
-            };
-            const newAuthResult = await respondToAuthChallenge(session, challengeResponses);
-            console.log('New authentication result:', newAuthResult);
-            return newAuthResult;
-        } else {
-            // Authentication successful without any challenge
-            console.log('Authentication successful:', authResult);
-            return authResult;
-        }
-    } catch (error) {
-        console.error('Error:', error);
-        throw error;
-    }
-}
 
 
 async function createUser(username, password, email) {
@@ -119,12 +80,12 @@ async function passwordReset(username,password) {
 }
 
 // Function to set new password after password reset
-async function newPassword(session, newPassword) {
+async function newPassword(session, params) {
+    // const {password}
     console.log(typeof session,"new password session");
     try {
-        const authResult = await respondToAuthChallenge(session, { newPassword });
+        const authResult = await respondToAuthChallenge(session, params);
         console.log('New password set successfully!');
-        // Here, you can store the tokens in localStorage or sessionStorage for future use
         return authResult;
     } catch (error) {
         console.error('Setting new password failed:', error);
@@ -132,7 +93,6 @@ async function newPassword(session, newPassword) {
     }
 }
 export {
-    initializeCognito,
     initiateAuth,
     respondToAuthChallenge,
     passwordReset,
