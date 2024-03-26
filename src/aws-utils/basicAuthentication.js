@@ -86,7 +86,6 @@ async function initiateAndRespondToAuth(username, password, newPassword) {
 
 
 async function createUser(username, password, email) {
-    debugger
     try {
         // Call the SignUp API to create a new user
         const command = new AdminCreateUserCommand({

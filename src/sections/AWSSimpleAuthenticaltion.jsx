@@ -3,7 +3,7 @@ import { createUser, initiateAuth, newPassword, passwordReset } from "../aws-uti
 
 function AWSSimpleAuthenticaltion() {
   const [username, setUserName] = useState("subhan.akram2400@gmail.com");
-  const [password, setPassword] = useState("F0rtyTw0!Pa$$w0rd");
+  const [password, setPassword] = useState("4qfm_eQTM2vc");
   const [tempPass,setTempPass] = useState("")
   async function login(username, password) {
     try {
