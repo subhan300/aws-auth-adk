@@ -3,6 +3,7 @@ import {
      InitiateAuthCommand, 
      RespondToAuthChallengeCommand,
      AdminCreateUserCommand,
+     SignUpCommand,
     } from "@aws-sdk/client-cognito-identity-provider";
 
 // Initialize CognitoIdentityProviderClient
@@ -47,18 +48,33 @@ async function respondToAuthChallenge(Session, ChallengeResponses) {
 
 
 async function createUser(username, password, email) {
+    console.log("pass",password,email)
     try {
         // Call the SignUp API to create a new user
-        const command = new AdminCreateUserCommand({
+        // const command = new AdminCreateUserCommand({
+        //     ClientId:clientId, // Replace with your Cognito User Pool client ID
+        //     UserPoolId: userPoolId,
+        //     Username: username,
+        //     TemporaryPassword: password,
+        //     UserAttributes: [{ Name: "name", Value: 'subhan123', },{ Name: "address", Value: 'subhan123', }],
+        //     ValidationData: [
+        //         {
+        //           Name: "phone", // required
+        //           Value: "+923362039061",
+        //         },
+        //       ],
+        //     DesiredDeliveryMediums: ["SMS"], // Specify the delivery medium for sending invitation messages to new users
+        //     // MessageAction: "SUPPRESS", // Specify whether to send an invitation message to the new user
+        //     ForceAliasCreation: true || false,
+        // });
+        const command = new SignUpCommand({
             ClientId:clientId, // Replace with your Cognito User Pool client ID
             UserPoolId: userPoolId,
             Username: username,
-            TemporaryPassword: password,
-            UserAttributes: [
-                { Name: "email", Value: email },
-            ],
-            DesiredDeliveryMediums: ["EMAIL"], // Specify the delivery medium for sending invitation messages to new users
-            MessageAction: "SUPPRESS", // Specify whether to send an invitation message to the new user
+            Password: password,
+            // UserAttributes: [{ Name: "name", Value: 'subhan123', },{ Name: "phone", Value: '+923362039061' },{ Name: "address", Value: 'subhan123', }],
+            // DesiredDeliveryMediums: ["SNS"], // Specify the delivery medium for sending invitation messages to new users
+            // MessageAction: "SUPPRESS", // Specify whether to send an invitation message to the new user
         });
         const response = await cognitoClient.send(command);
         return response; // Return the response if needed

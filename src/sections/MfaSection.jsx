@@ -17,8 +17,8 @@ function MfaSection() {
 
   return (
     <div>
-      <h2 >* Aws SRP Auth</h2>
-      <p>Login</p>
+      <h1 >* Aws MFA Login</h1>
+      <h3>Login</h3>
       <input
         value={username}
         placeholder="user name"

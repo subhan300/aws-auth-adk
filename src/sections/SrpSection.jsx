@@ -17,8 +17,8 @@ function SrpSection() {
 
   return (
     <div>
-      <h2 >* Aws SRP Auth</h2>
-      <p>Login</p>
+      <h1 >* Aws SRP Auth</h1>
+      <h3>Login</h3>
       <input
         value={username}
         placeholder="user name"
@@ -36,25 +36,7 @@ function SrpSection() {
         className=""
       ></input>
       <button onClick={login}>Sign In</button>
-      <p>Enter Mfa Code</p>
-      <input
-        value={mfa}
-        placeholder="Enter Mfa Code"
-        onChange={(e) => {
-          setMfa(e.target.value);
-        }}
-        className=""
-      ></input>
-      {/* <button onClick={()=>{signIn(username,password)}}>Sign In</button> */}
-      <p>Confirm Mfa Code</p>
-      <input
-        value={confirmMfa}
-        placeholder="Enter Mfa Code"
-        onChange={(e) => {
-          setConfirmMfa(e.target.value);
-        }}
-        className=""
-      ></input>
+     
     </div>
   );
 }

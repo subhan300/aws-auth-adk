@@ -10,7 +10,7 @@ function AWSSimpleAuthenticaltion() {
   const [username, setUserName] = useState("subhan.akram2400@gmail.com");
   const [password, setPassword] = useState("4qfm_eQTM2vc");
   const [newPasswordVal, setNewPasswordVal] = useState("4qfm_eQTM2vc");
-  const [tempPass, setTempPass] = useState("");
+  const [tempPass, setTempPass] = useState("4qfm_eQTM2vc");
   async function login(username, password) {
     try {
       const authResult = await initiateAuth(username, password);
@@ -32,7 +32,7 @@ function AWSSimpleAuthenticaltion() {
         console.log(authResult);
       }
     } catch (error) {
-      alert("Something went wrong");
+      // alert("Something went wrong");
       console.error("Login failed:", error);
       throw error;
     }
@@ -46,24 +46,25 @@ function AWSSimpleAuthenticaltion() {
         const newPasswordRes = await newPassword(resetPasswordRes.Session, {
           NEW_PASSWORD: newPasswordAtribute,
           USERNAME: username,
-          "userAttributes.address": "karachi",
-          "userAttributes.name": username,
-          "userAttributes.phone": "03362039061",
+          // "userAttributes.address": "",
+          // "userAttributes.name": "",
+          // "userAttributes.phone": "",
         });
+        console.log("new password set ",newPasswordRes)
         if (newPasswordRes) {
-          alert("New pass has been set successfully");
+          // alert("New pass has been set successfully");
         }
       }
     } catch (error) {
-      alert("Something went wrong");
+      // alert("Something went wrong");
       console.error("Login failed:", error);
       throw error;
     }
   }
-  console.log(tempPass, "tempPass");
   return (
     <div>
-      <h2>User login </h2>
+       <h1>* User Simple Signup and Login</h1>
+      <h3>User login </h3>
       <input
         value={username}
         placeholder="user name"
@@ -88,7 +89,7 @@ function AWSSimpleAuthenticaltion() {
         Login
       </button>
 
-      <h2>User creation By Admin</h2>
+      <h3>User creation By Admin</h3>
       <input
         value={username}
         placeholder="user name"
@@ -111,7 +112,7 @@ function AWSSimpleAuthenticaltion() {
         Create
       </button>
 
-      <h2>Set New Password</h2>
+      <h3>Set New Password</h3>
       <input
         value={username}
         placeholder="user name"
