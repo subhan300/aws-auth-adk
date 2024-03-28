@@ -11,7 +11,7 @@ function App() {
        <h1 style={{color:"brown",fontWeight:"bold"}}>AWS SDK AUTH </h1>
        <SrpSection />
        <AWSSimpleAuthenticaltion />
-       <MfaSection />
+       {/* <MfaSection /> */}
     </div>
   );
 }

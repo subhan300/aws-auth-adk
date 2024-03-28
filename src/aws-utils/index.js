@@ -10,53 +10,6 @@ const userPoolId = process.env.USER_POOL_ID;
 const client = new CognitoIdentityProviderClient({ region: process.env.REGION});
 
 
-async function respondToMFAChallenge(session, mfaCode, clientId, userPoolId) {
-  const client = new CognitoIdentityProviderClient({ region: "us-west-2" });
-
-  const respondToAuthChallengeCommand = new RespondToAuthChallengeCommand({
-    ChallengeName: "SMS_MFA",
-    ClientId: clientId,
-    ChallengeResponses: {
-      USERNAME: session.username,
-      SMS_MFA_CODE: mfaCode,
-    },
-    Session: session.session,
-  });
-
-  try {
-    const response = await client.send(respondToAuthChallengeCommand);
-    return response;
-  } catch (error) {
-    console.error("Error responding to MFA challenge:", error);
-    throw error;
-  }
-}
-
-async function confirmMFA(session, mfaCode, clientId, userPoolId) {
-  const client = new CognitoIdentityProviderClient({ region: "ap-south-1" });
-
-  const respondToAuthChallengeCommand = new RespondToAuthChallengeCommand({
-    ChallengeName: "SOFTWARE_TOKEN_MFA",
-    ClientId: clientId,
-    ChallengeResponses: {
-      USERNAME: session.username,
-      SOFTWARE_TOKEN_MFA_CODE: mfaCode,
-    },
-    Session: session.session,
-  });
-
-  try {
-    const response = await client.send(respondToAuthChallengeCommand);
-    return response;
-  } catch (error) {
-    console.error("Error confirming MFA:", error);
-    throw error;
-  }
-}
-
-
-
-
 
 export async function signIn(username, password) {
   const {SRP_A}=await calculateSRP_A(userPoolId)
