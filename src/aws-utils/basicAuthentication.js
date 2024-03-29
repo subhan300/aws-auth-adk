@@ -1,10 +1,10 @@
 import {
+    AdminCreateUserCommand,
   CognitoIdentityProviderClient,
   ConfirmForgotPasswordCommand,
   ForgotPasswordCommand,
   InitiateAuthCommand,
   RespondToAuthChallengeCommand,
-  SignUpCommand,
 } from "@aws-sdk/client-cognito-identity-provider";
 
 // Initialize CognitoIdentityProviderClient
