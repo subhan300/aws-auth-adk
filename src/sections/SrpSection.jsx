@@ -2,13 +2,11 @@ import React,{ useState } from "react";
 import {
   adminRespondToAuthChallenge,
   signIn,
-} from "../aws-utils";
+} from "../aws-utils/srpAuthentication";
 
 function SrpSection() {
   const [username, setUserName] = useState("subhan.akram2400@gmail.com");
   const [password, setPassword] = useState("4qfm_eQTM2vc");
-  const [mfa, setMfa] = useState("");
-  const [confirmMfa, setConfirmMfa] = useState("");
   const login = async () => {
     const authObj = await signIn(username, password);
     console.log("Auth Object===", authObj);

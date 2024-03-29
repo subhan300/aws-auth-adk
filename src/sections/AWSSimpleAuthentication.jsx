@@ -1,10 +1,9 @@
 import React, { useState } from "react";
 import {
+  confirmNewPassword,
   createUser,
   forgotPassword,
   initiateAuth,
-  newPassword,
-  passwordReset,
   respondToMFAChallenge,
 } from "../aws-utils/basicAuthentication";
 
@@ -15,7 +14,7 @@ function AWSSimpleAuthenticaltion() {
   const [session,setSession]=useState("")
   const [tempPass, setTempPass] = useState("4qfm_eQTM2vc");
   const [mfa, setMfa] = useState("");
-  const [confirmMfa, setConfirmMfa] = useState("");
+  const [confirmPasswordCode, setConfirmPasswordCode] = useState("");
   
   
   async function login(username, password) {
@@ -47,24 +46,10 @@ function AWSSimpleAuthenticaltion() {
       throw error;
     }
   }
-  async function handleSetNewPassword(username, password, newPasswordAtribute) {
+  async function handleSetNewPassword() {
     try {
-      const resetPasswordRes = await passwordReset(username, password);
-      if (resetPasswordRes) {
-        // debugger
-
-        const newPasswordRes = await newPassword(resetPasswordRes.Session, {
-          NEW_PASSWORD: newPasswordAtribute,
-          USERNAME: username,
-          // "userAttributes.address": "",
-          // "userAttributes.name": "",
-          // "userAttributes.phone": "",
-        });
-        console.log("new password set ",newPasswordRes)
-        if (newPasswordRes) {
-          // alert("New pass has been set successfully");
-        }
-      }
+      const payload={Username:username,ConfirmationCode:confirmPasswordCode,Password:newPasswordVal}
+      confirmNewPassword(payload)
     } catch (error) {
       // alert("Something went wrong");
       console.error("Login failed:", error);
@@ -72,7 +57,7 @@ function AWSSimpleAuthenticaltion() {
     }
   }
   const mfaSubmit=()=>{
-    console.log("mfa submit",mfa,"cofnirm mfa",confirmMfa);
+    console.log("mfa submit",mfa);
     const mfaPayload={username,session,mfaCode:mfa}
     respondToMFAChallenge(mfaPayload)
  }
@@ -116,15 +101,7 @@ function AWSSimpleAuthenticaltion() {
         }}
         className=""
       ></input>
-      <p>Confirm Mfa Code</p>
-      <input
-        value={confirmMfa}
-        placeholder="Enter Mfa Code"
-        onChange={(e) => {
-          setConfirmMfa(e.target.value);
-        }}
-        className=""
-      ></input>
+      
       <button onClick={mfaSubmit}>Mfa Submit</button>
   
       <h3>User creation By Admin</h3>
@@ -160,23 +137,28 @@ function AWSSimpleAuthenticaltion() {
         }}
       ></input> 
        <button  style={{marginLeft:"1rem"}} onClick={passwordReset}>Password Reset</button>
-      <p>Old Password</p>
-      <input disabled value={password}></input>
       <input
-        value={password}
+        value={newPasswordVal}
         placeholder="New Password"
         onChange={(e) => {
           setNewPasswordVal(e.target.value);
         }}
       ></input>
-      <button
-        onClick={() => {
-          handleSetNewPassword(username, password, newPasswordVal);
+      <p>Enter password reset Code</p>
+      <input
+        value={confirmPasswordCode}
+        placeholder="Enter Mfa Code"
+        onChange={(e) => {
+          setConfirmPasswordCode(e.target.value);
         }}
+        className=""
+      ></input>
+      <button
+        onClick={handleSetNewPassword}
       >
-        Create
+        set new password
       </button>
-      <h1>Password Reset</h1>
+
      
     </div>
   );
